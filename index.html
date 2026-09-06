@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08111d">
+  <title>STOCKFLOW AI</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="toast"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo-area">
+    <div class="logo-icon">S</div>
+    <div>
+      <h2>STOCKFLOW</h2>
+      <span>SMART BUSINESS SYSTEM</span>
+    </div>
+  </div>
+
+  <button class="profile-btn" onclick="showPage('settings')">⚙</button>
+</header>
+
+
+<!-- APP -->
+<main>
+
+<!-- ================= DASHBOARD ================= -->
+
+<section class="page active" id="dashboard">
+
+  <div class="welcome">
+    <div>
+      <p>BUSINESS OVERVIEW</p>
+      <h1 id="businessTitle">My Business</h1>
+      <span id="dateText"></span>
+    </div>
+
+    <button class="add-btn" onclick="showPage('scanner1')">
+      + Scan
+    </button>
+  </div>
+
+
+  <div class="stats-grid">
+
+    <div class="stat-card green">
+      <span>💰 Total Sales</span>
+      <h2 id="totalSales">₹0</h2>
+      <small>All recorded sales</small>
+    </div>
+
+    <div class="stat-card blue">
+      <span>📦 Products</span>
+      <h2 id="totalProducts">0</h2>
+      <small>Inventory items</small>
+    </div>
+
+    <div class="stat-card orange">
+      <span>📊 Stock Value</span>
+      <h2 id="stockValue">₹0</h2>
+      <small>Current inventory</small>
+    </div>
+
+    <div class="stat-card purple">
+      <span>⚠️ Low Stock</span>
+      <h2 id="lowStock">0</h2>
+      <small>Needs attention</small>
+    </div>
+
+  </div>
+
+
+  <h3 class="section-title">Smart Scanners</h3>
+
+  <div class="scanner-grid">
+
+    <button class="scanner-card scanner-one" onclick="showPage('scanner1')">
+      <div class="scanner-number">01</div>
+      <div class="scanner-icon">📸</div>
+      <h3>Customer Bill Scan</h3>
+      <p>Scan bill → detect products → deduct stock</p>
+    </button>
+
+    <button class="scanner-card scanner-two" onclick="showPage('scanner2')">
+      <div class="scanner-number">02</div>
+      <div class="scanner-icon">📦</div>
+      <h3>Product Scanner</h3>
+      <p>Add product image and inventory details</p>
+    </button>
+
+    <button class="scanner-card scanner-three" onclick="showPage('scanner3')">
+      <div class="scanner-number">03</div>
+      <div class="scanner-icon">🧾</div>
+      <h3>Smart Bill Maker</h3>
+      <p>Create automatic professional invoices</p>
+    </button>
+
+  </div>
+
+
+  <div class="dashboard-row">
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Low Stock Alerts</h3>
+        <button onclick="showPage('inventory')">View all</button>
+      </div>
+
+      <div id="lowStockList"></div>
+    </div>
+
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Recent Activity</h3>
+        <button onclick="showPage('history')">History</button>
+      </div>
+
+      <div id="recentActivity"></div>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ================= SCANNER 1 ================= -->
+
+<section class="page" id="scanner1">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">SCANNER 01</span>
+      <h1>Customer Bill Scanner</h1>
+      <p>Upload a customer bill and automatically update your inventory.</p>
+    </div>
+  </div>
+
+
+  <div class="scanner-main-card">
+
+    <div class="scanner-visual">
+      <div class="scan-circle">📸</div>
+      <h2>Scan Customer Bill</h2>
+      <p>Upload a clear image containing product names and quantities.</p>
+
+      <label class="upload-button">
+        Upload Bill Image
+        <input type="file"
+               accept="image/*"
+               capture="environment"
+               onchange="scanCustomerBill(event)">
+      </label>
+
+    </div>
+
+    <div id="scanner1Loading"></div>
+
+  </div>
+
+
+  <div class="panel hidden" id="scanner1Results">
+
+    <div class="panel-header">
+      <div>
+        <h3>Detected Products</h3>
+        <p>Review before updating stock.</p>
+      </div>
+
+      <button class="primary-btn" onclick="confirmStockDeduction()">
+        Confirm & Deduct
+      </button>
+    </div>
+
+    <div id="detectedProducts"></div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ================= SCANNER 2 ================= -->
+
+<section class="page" id="scanner2">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">SCANNER 02</span>
+      <h1>Product Storage Scanner</h1>
+      <p>Create your visual product inventory.</p>
+    </div>
+  </div>
+
+
+  <div class="product-form-layout">
+
+    <div class="image-upload-card">
+
+      <div class="image-preview" id="productPreview">
+        <span>📦</span>
+        <p>Product Image</p>
+      </div>
+
+      <label class="upload-button">
+        Upload Product Image
+        <input type="file"
+               accept="image/*"
+               capture="environment"
+               onchange="previewProduct(event)">
+      </label>
+
+    </div>
+
+
+    <div class="form-card">
+
+      <h2>Add Product To Storage</h2>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Product Name</label>
+          <input id="productName" placeholder="Example: Coca Cola 500ml">
+        </div>
+
+        <div class="field">
+          <label>SKU / Barcode</label>
+          <input id="productSKU" placeholder="Optional product code">
+        </div>
+
+        <div class="field">
+          <label>Stock Quantity</label>
+          <input id="productStock" type="number" placeholder="100">
+        </div>
+
+        <div class="field">
+          <label>Cost Per Unit</label>
+          <input id="productCost" type="number" placeholder="₹0">
+        </div>
+
+        <div class="field">
+          <label>Selling Price</label>
+          <input id="productPrice" type="number" placeholder="₹0">
+        </div>
+
+        <div class="field">
+          <label>Low Stock Alert</label>
+          <input id="productAlert" type="number" value="5">
+        </div>
+
+      </div>
+
+      <button class="primary-btn full" onclick="saveProduct()">
+        📦 Add To Smart Storage
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ================= SCANNER 3 ================= -->
+
+<section class="page" id="scanner3">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">SCANNER 03</span>
+      <h1>Smart Bill Maker</h1>
+      <p>Select products and automatically generate a professional invoice.</p>
+    </div>
+  </div>
+
+
+  <div class="billing-layout">
+
+    <div class="bill-builder">
+
+      <div class="customer-fields">
+
+        <input id="invoiceCustomer"
+               placeholder="Customer Name">
+
+        <input id="invoicePhone"
+               placeholder="Customer Phone">
+
+      </div>
+
+
+      <div class="product-search">
+
+        <input id="invoiceSearch"
+               placeholder="🔍 Search product from storage..."
+               oninput="renderInvoiceProducts()">
+
+      </div>
+
+
+      <div class="invoice-product-list" id="invoiceProductList"></div>
+
+
+      <h3>Selected Products</h3>
+
+      <div id="invoiceCart"></div>
+
+    </div>
+
+
+    <div class="invoice-preview-card">
+
+      <div id="invoicePreview">
+
+        <div class="invoice-logo">
+          STOCKFLOW
+          <span>SMART BUSINESS</span>
+        </div>
+
+        <hr>
+
+        <div class="invoice-customer">
+          <b>Customer</b>
+          <span id="previewCustomer">Walk-in Customer</span>
+        </div>
+
+        <div id="previewItems"></div>
+
+        <div class="invoice-total">
+          <span>Total</span>
+          <strong id="invoiceTotal">₹0</strong>
+        </div>
+
+      </div>
+
+      <button class="primary-btn full" onclick="saveInvoice()">
+        🧾 Generate & Save Invoice
+      </button>
+
+      <button class="secondary-btn full" onclick="printInvoice()">
+        🖨 Print Invoice
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ================= INVENTORY ================= -->
+
+<section class="page" id="inventory">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">SMART STORAGE</span>
+      <h1>Inventory</h1>
+    </div>
+
+    <button class="primary-btn" onclick="showPage('scanner2')">
+      + Add Product
+    </button>
+  </div>
+
+  <input class="search-input"
+         id="inventorySearch"
+         placeholder="🔍 Search inventory..."
+         oninput="renderInventory()">
+
+  <div class="inventory-grid" id="inventoryList"></div>
+
+</section>
+
+
+
+<!-- ================= HISTORY ================= -->
+
+<section class="page" id="history">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">BUSINESS ACTIVITY</span>
+      <h1>Sales & History</h1>
+    </div>
+  </div>
+
+  <div id="historyList"></div>
+
+</section>
+
+
+
+<!-- ================= SETTINGS ================= -->
+
+<section class="page" id="settings">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">SETTINGS</span>
+      <h1>Business Settings</h1>
+    </div>
+  </div>
+
+  <div class="settings-card">
+
+    <label>Business Name</label>
+    <input id="businessNameInput" placeholder="My Business">
+
+    <label>Business Address</label>
+    <input id="businessAddressInput" placeholder="Business address">
+
+    <label>Phone Number</label>
+    <input id="businessPhoneInput" placeholder="Phone number">
+
+    <button class="primary-btn full" onclick="saveSettings()">
+      Save Business Details
+    </button>
+
+  </div>
+
+
+  <div class="settings-card">
+
+    <h3>Data Management</h3>
+
+    <button class="secondary-btn full" onclick="exportData()">
+      ⬇ Download Backup
+    </button>
+
+    <label class="secondary-upload">
+      ⬆ Restore Backup
+      <input type="file"
+             accept=".json"
+             onchange="restoreData(event)">
+    </label>
+
+    <button class="danger-btn full" onclick="resetApp()">
+      Delete All Data
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+
+
+<!-- BOTTOM NAVIGATION -->
+
+<nav class="bottom-nav">
+
+  <button onclick="showPage('dashboard')" class="nav-btn active-nav">
+    <span>⌂</span>
+    Home
+  </button>
+
+  <button onclick="showPage('scanner1')" class="nav-btn">
+    <span>📸</span>
+    Scan
+  </button>
+
+  <button onclick="showPage('scanner2')" class="nav-btn">
+    <span>📦</span>
+    Storage
+  </button>
+
+  <button onclick="showPage('scanner3')" class="nav-btn">
+    <span>🧾</span>
+    Bill
+  </button>
+
+  <button onclick="showPage('inventory')" class="nav-btn">
+    <span>▦</span>
+    Stock
+  </button>
+
+</nav>
+
+
+<!-- OCR LIBRARY -->
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
